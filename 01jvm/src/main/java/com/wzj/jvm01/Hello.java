@@ -1,4 +1,4 @@
-package com.wzj.production.jvm;
+package com.wzj.jvm01;
 
 /**
  * @author wangzhijie

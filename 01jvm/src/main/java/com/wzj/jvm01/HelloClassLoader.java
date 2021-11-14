@@ -1,4 +1,4 @@
-package com.wzj.production.jvm;
+package com.wzj.jvm01;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

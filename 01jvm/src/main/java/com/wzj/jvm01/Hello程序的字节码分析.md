@@ -3,8 +3,8 @@ wangzhijie@bogon jvm % javap -c Hello
 警告: 文件 ./Hello.class 不包含类 Hello
 Compiled from "Hello.java"
 // Hello 类是默认的一个无参数的构造函数
-public class com.wzj.production.jvm.Hello {
-  public com.wzj.production.jvm.Hello();
+public class Hello {
+  public Hello();
     Code:
        // aload_0 从局部变量0中装载引用类型值
        0: aload_0
