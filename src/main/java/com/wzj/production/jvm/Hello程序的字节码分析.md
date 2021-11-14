@@ -1,5 +1,5 @@
-### wangzhijie@bogon jvm % javac Hello.java
-### wangzhijie@bogon jvm % javap -c Hello
+wangzhijie@bogon jvm % javac Hello.java
+wangzhijie@bogon jvm % javap -c Hello
 警告: 文件 ./Hello.class 不包含类 Hello
 Compiled from "Hello.java"
 // Hello 类是默认的一个无参数的构造函数
