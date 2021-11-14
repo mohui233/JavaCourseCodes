@@ -1,4 +1,8 @@
-## Java 8 不同GC和堆内存的总结
+# Java 8 不同GC和堆内存的总结
+
+
+
+##  使用 GCLogAnalysis.java 自己演练一遍串行 / 并行 /CMS/G1的案例
 
 ### 一、并行 GC
 
@@ -7,7 +11,7 @@
 1.  默认内存配置
 
 ```java
- java -XX:+PrintGCDetails com.wzj.production.nio01.GCLogAnalysis
+ java -XX:+PrintGCDetails com.wzj.nio01.GCLogAnalysis
  
  执行 5 次 Full GC 。
  
@@ -141,5 +145,329 @@ java -XX:+PrintGC -XX:+PrintGCDateStamps -Xmx4g -Xms4g -XX:+UseG1GC com.wzj.prod
 只执行 20 次 Young GC 。
 
 Young区和Old区比较大。Young 区还没晋升到 Old区。
+```
+
+
+
+
+
+## 使用压测工具wrk 或 sb，演练 gateway-server-0.0.1-SNAPSHOT.jar 示例
+
+### 一、并行 GC
+
+> 添加 GC 策略参数  -XX:+UseParallelGC ，或 GC策略删掉不要。Java8默认的解决策略，并行GC。
+
+1. 手动配置内存参数  -Xmx1g -Xms1g
+
+```java
+wangzhijie@bogon nio01 % java -jar -Xmx1g -Xms1g -XX:+UseParallelGC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     3.37ms   11.77ms 195.91ms   94.49%
+    Req/Sec    25.67k    11.69k   66.08k    67.18%
+  1511850 requests in 30.09s, 375.14MB read
+  Non-2xx or 3xx responses: 1511850
+Requests/sec:  50243.26
+Transfer/sec:     12.47MB
+```
+
+2. 手动配置内存参数 -Xmx4g -Xms4g    
+
+   ```java
+   wangzhijie@bogon nio01 % java -jar -Xmx4g -Xms4g -XX:+UseParallelGC gateway-server-0.0.1-SNAPSHOT.jar 
+   wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+   Running 30s test @ http://localhost:8088
+     2 threads and 40 connections
+     Thread Stats   Avg      Stdev     Max   +/- Stdev
+       Latency     3.73ms   12.95ms 253.85ms   94.30%
+       Req/Sec    25.43k    11.96k   63.08k    66.10%
+     1499455 requests in 30.08s, 372.07MB read
+     Non-2xx or 3xx responses: 1499455
+   Requests/sec:  49853.64
+   Transfer/sec:     12.37MB
+   ```
+
+3. 手动配置内存参数 -Xmx256m -Xms256m
+
+```java
+wangzhijie@bogon nio01 % java -jar -Xmx256m -Xms256m -XX:+UseParallelGC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     3.68ms   12.91ms 231.04ms   94.39%
+    Req/Sec    23.32k     9.66k   47.17k    66.72%
+  1384188 requests in 30.06s, 343.47MB read
+  Non-2xx or 3xx responses: 1384188
+Requests/sec:  46042.00
+Transfer/sec:     11.42MB
+```
+
+4. 手动配置内存参数 -Xmx512m -Xms512m
+
+```java
+wangzhijie@bogon nio01 % java -jar -Xmx512m -Xms512m -XX:+UseParallelGC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     3.55ms   13.19ms 222.19ms   94.92%
+    Req/Sec    25.13k    10.31k   55.52k    70.32%
+  1491997 requests in 30.07s, 370.22MB read
+  Non-2xx or 3xx responses: 1491997
+Requests/sec:  49624.71
+Transfer/sec:     12.31MB
+```
+
+
+
+### 二、串行 GC
+
+> 添加 GC 策略参数  -XX:+UseSerialGC 
+
+1. 手动配置内存参数  -Xmx1g -Xms1g
+
+```java
+wangzhijie@bogon nio01 % java -jar -Xmx1g -Xms1g -XX:+UseSerialGC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     5.00ms   16.79ms 258.50ms   93.78%
+    Req/Sec    23.71k    11.35k   56.99k    63.73%
+  1403513 requests in 30.07s, 348.26MB read
+  Non-2xx or 3xx responses: 1403513
+Requests/sec:  46673.99
+Transfer/sec:     11.58MB
+```
+
+2. 手动配置内存参数 -Xmx4g -Xms4g    
+
+```java
+wangzhijie@bogon nio01 %  java -jar -Xmx4g -Xms4g -XX:+UseSerialGC gateway-server-0.0.1-SNAPSHOT.jar 
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     4.94ms   17.00ms 246.70ms   93.94%
+    Req/Sec    24.53k    11.66k   58.94k    66.78%
+  1449097 requests in 30.08s, 359.57MB read
+  Non-2xx or 3xx responses: 1449097
+Requests/sec:  48172.57
+Transfer/sec:     11.95MB
+```
+
+3. 手动配置内存参数 -Xmx256m -Xms256m
+
+```java
+wangzhijie@bogon nio01 %  java -jar -Xmx256m -Xms256m -XX:+UseSerialGC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     3.77ms   16.21ms 277.29ms   96.13%
+    Req/Sec    23.48k     8.82k   52.90k    71.04%
+  1395149 requests in 30.10s, 346.19MB read
+  Non-2xx or 3xx responses: 1395149
+Requests/sec:  46346.54
+Transfer/sec:     11.50MB
+```
+
+4. 手动配置内存参数 -Xmx512m -Xms512m
+
+```java
+wangzhijie@bogon nio01 %  java -jar -Xmx512m -Xms512m -XX:+UseSerialGC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     2.14ms    7.92ms 159.13ms   95.82%
+    Req/Sec    24.82k     9.83k   53.31k    70.27%
+  1470647 requests in 30.03s, 364.92MB read
+  Non-2xx or 3xx responses: 1470647
+Requests/sec:  48971.12
+Transfer/sec:     12.15MB
+```
+
+
+
+### 三、CMS GC
+
+> 添加 GC 策略参数  -XX:+UseConcMarkSweepGC 
+
+1. 手动配置内存参数  -Xmx1g -Xms1g
+
+```java
+wangzhijie@bogon nio01 % java -jar -Xmx1g -Xms1g -XX:+UseConcMarkSweepGC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     4.14ms   13.54ms 319.40ms   93.54%
+    Req/Sec    24.30k    11.65k   58.27k    66.09%
+  1432258 requests in 30.02s, 355.40MB read
+  Non-2xx or 3xx responses: 1432258
+Requests/sec:  47713.01
+Transfer/sec:     11.84MB
+```
+
+2. 手动配置内存参数 -Xmx4g -Xms4g    
+
+```java
+wangzhijie@bogon nio01 %  java -jar -Xmx4g -Xms4g -XX:+UseConcMarkSweepGC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     4.12ms   14.43ms 252.77ms   94.36%
+    Req/Sec    25.09k    11.78k   62.16k    67.40%
+  1489082 requests in 30.06s, 369.50MB read
+  Non-2xx or 3xx responses: 1489082
+Requests/sec:  49544.69
+Transfer/sec:     12.29MB
+```
+
+3. 手动配置内存参数 -Xmx256m -Xms256m
+
+```java
+wangzhijie@bogon nio01 %  java -jar -Xmx256m -Xms256m -XX:+UseConcMarkSweepGC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     3.67ms   13.09ms 227.86ms   94.77%
+    Req/Sec    23.37k    10.47k   55.33k    67.91%
+  1383694 requests in 30.09s, 343.34MB read
+  Non-2xx or 3xx responses: 1383694
+Requests/sec:  45982.27
+Transfer/sec:     11.41MB
+```
+
+4. 手动配置内存参数 -Xmx512m -Xms512m
+
+```java
+wangzhijie@bogon nio01 %  java -jar -Xmx512m -Xms512m -XX:+UseConcMarkSweepGC gateway-server-0.0.1-SNAPSHOT.jar
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     5.10ms   16.36ms 287.19ms   93.38%
+    Req/Sec    22.44k    11.41k   63.73k    65.31%
+  1331036 requests in 30.09s, 330.28MB read
+  Non-2xx or 3xx responses: 1331036
+Requests/sec:  44238.54
+Transfer/sec:     10.98MB
+```
+
+
+
+### 四、G1 GC
+
+> 添加 GC 策略参数  -XX:+UseG1GC              
+
+1. 手动配置内存参数 -Xmx1g -Xms1g          
+
+   ```java
+   wangzhijie@bogon nio01 % java -jar -Xmx1g -Xms1g -XX:+UseG1GC gateway-server-0.0.1-SNAPSHOT.jar
+   wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+   Running 30s test @ http://localhost:8088
+     2 threads and 40 connections
+     Thread Stats   Avg      Stdev     Max   +/- Stdev
+       Latency     4.86ms   15.68ms 273.75ms   93.43%
+       Req/Sec    22.95k    11.53k   62.71k    67.12%
+     1353785 requests in 30.06s, 335.92MB read
+     Non-2xx or 3xx responses: 1353785
+   Requests/sec:  45037.34
+   Transfer/sec:     11.18MB
+   ```
+
+2. 手动配置内存参数 -Xmx4g -Xms4g    
+
+   ```java
+   wangzhijie@bogon nio01 % java -jar -Xmx4g -Xms4g -XX:+UseG1GC gateway-server-0.0.1-SNAPSHOT.jar
+   wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+   Running 30s test @ http://localhost:8088
+     2 threads and 40 connections
+     Thread Stats   Avg      Stdev     Max   +/- Stdev
+       Latency     3.80ms   12.66ms 237.47ms   94.11%
+       Req/Sec    22.69k    11.68k   61.02k    65.92%
+     1337529 requests in 30.10s, 331.89MB read
+     Non-2xx or 3xx responses: 1337529
+   Requests/sec:  44437.50
+   Transfer/sec:     11.03MB
+   ```
+
+3. 手动配置内存参数 -Xmx256m -Xms256m
+
+```java
+wangzhijie@bogon nio01 % java -jar -Xmx256m -Xms256m -XX:+UseG1GC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     4.84ms   14.22ms 248.23ms   92.78%
+    Req/Sec    20.43k    11.26k   51.48k    61.82%
+  1206388 requests in 30.08s, 299.35MB read
+  Non-2xx or 3xx responses: 1206388
+Requests/sec:  40108.13
+Transfer/sec:      9.95MB
+```
+
+4. 手动配置内存参数 -Xmx512m -Xms512m
+
+```java
+wangzhijie@bogon nio01 % java -jar -Xmx512m -Xms512m -XX:+UseG1GC gateway-server-0.0.1-SNAPSHOT.jar
+wangzhijie@bogon nio01 % wrk -c 40 -d30s http://localhost:8088
+Running 30s test @ http://localhost:8088
+  2 threads and 40 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     4.32ms   14.36ms 212.88ms   93.78%
+    Req/Sec    23.42k    11.59k   61.87k    66.61%
+  1386413 requests in 30.02s, 344.02MB read
+  Non-2xx or 3xx responses: 1386413
+Requests/sec:  46177.88
+Transfer/sec:     11.46MB
+```
+
+
+
+### 五、总结
+
+> 无论内存参数如何，每秒的请求数，处理能力。并行 GC 最好。
+>
+> 总体而言，内置配置越大，处理能力越好。
+>
+> 并行GC，配置内存参数1g和4g相差不大。所以，采用适当的配置参数，一样能够提高并发处理能力。
+
+1. 手动配置内存参数 -Xmx1g -Xms1g
+
+```java
+第一次测定 Requests/sec:  并行 GC 50243.26   CMS GC 47713.01   串行 GC 46673.99   G1 GC 45037.34    
+第二次测定 Requests/sec:  并行 GC 46854.74
+第二次测定 Requests/sec:  并行 GC 54238.89
+```
+
+2. 手动配置内存参数 -Xmx4g -Xms4g    
+
+```java
+第一次测定 Requests/sec:  并行 GC 49853.64   CMS GC 49544.69   串行 GC 48172.57   G1 GC 44437.50 
+第二次测定 Requests/sec:  并行 GC 48185.5
+第三次测定 Requests/sec:  并行 GC 45863.76
+第四次测定 Requests/sec:  并行 GC 54259.01
+```
+
+3. 手动配置内存参数 -Xmx256m -Xms256m 
+
+```java
+第一次测定 Requests/sec: 并行 GC 46042.00   CMS GC 45982.27   串行 GC 46346.54   G1 GC 40108.13
+第二次测定 Requests/sec: 并行 GC 47910.46
+```
+
+3. 手动配置内存参数 -Xmx512m -Xms512m
+
+```java
+第一次测定 Requests/sec: 并行 GC 49624.71   CMS GC 44238.54   串行 GC 48971.12   G1 GC 46177.88 
+第二次测定 Requests/sec: 并行 GC 45975.01
 ```
 
