@@ -1,3 +1,4 @@
+```java
 wangzhijie@bogon jvm % javac Hello.java
 wangzhijie@bogon jvm % javap -c Hello
 警告: 文件 ./Hello.class 不包含类 Hello
@@ -82,3 +83,5 @@ public class Hello {
       // return 从方法中返回，返回值为void
       71: return
 }
+```
+
