@@ -5,6 +5,9 @@ import com.wzj.nio02.inbound.HttpInboundServer;
 
 import java.util.Arrays;
 
+/**
+ * @author wangzhijie
+ */
 public class NettyServerApplication {
 
     public final static String GATEWAY_NAME = "NIOGateway";
