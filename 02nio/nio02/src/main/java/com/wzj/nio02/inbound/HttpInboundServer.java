@@ -14,6 +14,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * @author wangzhijie
+ */
 @Data
 public class HttpInboundServer {
 

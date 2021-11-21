@@ -1,8 +1,11 @@
-package com.wzj.nio02.outbound.httpclient4;
+package com.wzj.nio02.outbound;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author wangzhijie
+ */
 public class NamedThreadFactory implements ThreadFactory {
 
     private final ThreadGroup group;
