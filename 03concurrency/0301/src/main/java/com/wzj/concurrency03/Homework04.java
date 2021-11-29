@@ -19,9 +19,16 @@ public class Homework04 {
 
         // 异步执行 下面方法
         try {
-            add();
+            new Thread(() -> { SyncCount.add(); }).start();
+
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             // 这是得到的返回值
-            int result = get();
+            int result = SyncCount.get();
 
             // 确保 拿到result 并输出
             System.out.println("异步计算结果为："+result);
@@ -36,19 +43,20 @@ public class Homework04 {
         }
     }
 
-    public static boolean add() {
-        ReentrantLock lock = new ReentrantLock();
-        lock.lock();
-        try {
-            b = sum();
-            return true;
-        } finally {
-            lock.unlock();
+    public static class SyncCount {
+        public static boolean add() {
+            ReentrantLock lock = new ReentrantLock(true);
+            lock.lock();
+            try {
+                b = sum();
+                return true;
+            } finally {
+                lock.unlock();
+            }
         }
-    }
-
-    public static int get() {
-        return b;
+        public static int get() {
+            return b;
+        }
     }
 
     private static int sum() {
