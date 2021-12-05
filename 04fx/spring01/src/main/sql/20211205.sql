@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS t_account (account_id BIGINT NOT NULL AUTO_INCREMENT, user_id INT NOT NULL, status VARCHAR(50), PRIMARY KEY (account_id));
