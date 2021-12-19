@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wzj.spring01.mapper.TOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.wzj.spring01.entity.TOrder">
+        <result property="orderNum" column="order_num" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="orderTotalPrice" column="order_total_price" jdbcType="NUMERIC"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="delFlag" column="del_flag" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="batchInsert">
+        INSERT INTO t_order(order_num) VALUES
+        <foreach collection="list" separator="," item="item">
+            (#{item.orderNum})
+        </foreach>
+    </insert>
+
+</mapper>
