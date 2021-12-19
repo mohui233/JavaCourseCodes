@@ -17,6 +17,8 @@ import java.util.concurrent.*;
 /**
  * 订单表(TOrder)表服务实现类
  *
+ * （必做）按自己设计的表结构，插入 100 万订单模拟数据，测试不同方式的插入效率
+ *
  * @author wangzhijie
  * @since 2021-12-19 12:16:31
  */
